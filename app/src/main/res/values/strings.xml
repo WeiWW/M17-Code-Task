@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">M17Test</string>
+    <string name="search_user">Search User</string>
 </resources>
