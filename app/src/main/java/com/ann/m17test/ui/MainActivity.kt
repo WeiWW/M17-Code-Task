@@ -1,22 +1,25 @@
 package com.ann.m17test.ui
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ann.m17test.R
 import com.ann.m17test.data.model.User
 import com.ann.m17test.utils.Status
+import com.ann.m17test.utils.hideSoftKeyboard
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.viewmodel.ext.android.viewModel
 
 
 class MainActivity : AppCompatActivity() {
 
-    private val mainViewModel : MainViewModel by viewModel()
+    private val mainViewModel: MainViewModel by viewModel()
     private lateinit var adapter: MainAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,6 +31,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupUI() {
+        searchEditText.setOnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                Log.d("SEARCH", v.text.toString())
+                hideSoftKeyboard(this)
+                mainViewModel.fetchUsers(v.text.toString())
+                return@setOnEditorActionListener true
+            }
+            return@setOnEditorActionListener false
+        }
+
         recyclerView.layoutManager = LinearLayoutManager(this)
         adapter = MainAdapter(arrayListOf())
         recyclerView.addItemDecoration(

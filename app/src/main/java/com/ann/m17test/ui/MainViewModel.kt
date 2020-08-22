@@ -19,15 +19,11 @@ class MainViewModel(
     val users: LiveData<Resource<GithubUser>>
         get() = _users
 
-    init {
-        fetchUsers()
-    }
-
-    private fun fetchUsers() {
+    fun fetchUsers(query:String) {
         viewModelScope.launch {
             _users.postValue(Resource.loading(null))
             if (networkHelper.isNetworkConnected()) {
-                mainRepository.getUsers("a").let {
+                mainRepository.getUsers(query).let {
                     if (it.isSuccessful) {
                         _users.postValue(Resource.success(it.body()))
                     } else _users.postValue(Resource.error(it.errorBody().toString(), null))
