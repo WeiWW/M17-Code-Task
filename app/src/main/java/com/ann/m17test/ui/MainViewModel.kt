@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ann.m17test.data.model.User
+import com.ann.m17test.data.model.GithubUser
 import com.ann.m17test.data.repository.MainRepository
 import com.ann.m17test.utils.NetworkHelper
 import com.ann.m17test.utils.Resource
@@ -15,8 +15,8 @@ class MainViewModel(
     private val networkHelper: NetworkHelper
 ) : ViewModel() {
 
-    private val _users = MutableLiveData<Resource<List<User>>>()
-    val users: LiveData<Resource<List<User>>>
+    private val _users = MutableLiveData<Resource<GithubUser>>()
+    val users: LiveData<Resource<GithubUser>>
         get() = _users
 
     init {

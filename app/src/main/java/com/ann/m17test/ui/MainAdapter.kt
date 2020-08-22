@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.ann.m17test.R
+import com.ann.m17test.data.model.GithubUser
 import com.ann.m17test.data.model.User
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.item_layout.view.*
@@ -15,9 +16,9 @@ class MainAdapter(
 
     class DataViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(user: User) {
-            itemView.textViewUserName.text = user.name
+            itemView.textViewUserName.text = user.login
             Glide.with(itemView.imageViewAvatar.context)
-                .load(user.avatar)
+                .load(user.avatar_url)
                 .into(itemView.imageViewAvatar)
         }
     }

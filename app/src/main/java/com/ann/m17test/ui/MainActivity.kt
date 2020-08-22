@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
             when (it.status) {
                 Status.SUCCESS -> {
                     progressBar.visibility = View.GONE
-                    it.data?.let { users -> renderList(users) }
+                    it.data?.let { users -> renderList(users.items) }
                     recyclerView.visibility = View.VISIBLE
                 }
                 Status.LOADING -> {

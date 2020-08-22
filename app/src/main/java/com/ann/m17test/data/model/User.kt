@@ -2,11 +2,14 @@ package com.ann.m17test.data.model
 
 import com.squareup.moshi.Json
 
+data class GithubUser(
+    val incomplete_results: Boolean,
+    val items: List<User>,
+    val total_count: Int
+)
+
 data class User(
-    @Json(name = "id")
     val id: Int = 0,
-    @Json(name = "login")
-    val name: String = "",
-    @Json(name = "avatar_url")
-    val avatar: String = ""
+    val login: String = "",
+    val avatar_url: String = ""
 )
