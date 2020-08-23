@@ -1,4 +1,4 @@
-package com.ann.m17test.ui
+package com.ann.m17test.ui.viewHolder
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

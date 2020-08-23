@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ann.m17test.R
 import com.ann.m17test.data.model.User
+import com.ann.m17test.ui.adapter.MainPagingAdapter
+import com.ann.m17test.ui.viewModel.MainViewModel
 import com.ann.m17test.utils.Status
 import com.ann.m17test.utils.hideSoftKeyboard
 import kotlinx.android.synthetic.main.activity_main.*

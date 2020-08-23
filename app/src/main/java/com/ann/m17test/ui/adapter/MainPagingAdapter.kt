@@ -1,8 +1,9 @@
-package com.ann.m17test.ui
+package com.ann.m17test.ui.adapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.ann.m17test.data.model.User
+import com.ann.m17test.ui.viewHolder.UserViewHolder
 
 
 class MainPagingAdapter : RecyclerView.Adapter<UserViewHolder>() {

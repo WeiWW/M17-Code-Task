@@ -1,4 +1,4 @@
-package com.ann.m17test.ui
+package com.ann.m17test.ui.viewModel
 
 import androidx.lifecycle.*
 import com.ann.m17test.data.model.User
