@@ -1,21 +1,19 @@
 package com.ann.m17test.data.repository
 
-import android.util.Log
 import com.ann.m17test.data.api.ApiHelper
 import com.ann.m17test.data.model.User
-import com.ann.m17test.data.model.UserSearchResult
+import com.ann.m17test.utils.NetworkHelper
+import com.ann.m17test.utils.Resource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
-import retrofit2.HttpException
-import java.io.IOException
 
 private const val GITHUB_STARTING_PAGE_INDEX = 1
 private const val NETWORK_PAGE_SIZE = 100
 
 @ExperimentalCoroutinesApi
-class MainRepository(private val apiHelper: ApiHelper) {
+class MainRepository(private val apiHelper: ApiHelper, private val networkHelper: NetworkHelper) {
     // keep the last requested page. When the request is successful, increment the page number.
     private var lastRequestedPage = GITHUB_STARTING_PAGE_INDEX
 
@@ -24,58 +22,63 @@ class MainRepository(private val apiHelper: ApiHelper) {
 
     // avoid triggering multiple requests in the same time
     private var isRequestInProgress = false
-
+    // check if load all the data
     private var isReachTotalCount = false
 
     // keep channel of results. The channel allows us to broadcast updates so
     // the subscriber will have the latest data
-    private val searchResults = ConflatedBroadcastChannel<UserSearchResult>()
+    private val searchResults = ConflatedBroadcastChannel<Resource<List<User>>>()
 
-    suspend fun getUsers(q: String) = apiHelper.getUsers(q)
-
-
-    suspend fun getSearchResultStream(queryString: String): Flow<UserSearchResult> {
-        lastRequestedPage = 1
+    suspend fun getSearchResultStream(queryString: String): Flow<Resource<List<User>>> {
         inMemoryCache.clear()
         isReachTotalCount = false
         requestAndSaveData(queryString)
         return searchResults.asFlow()
     }
 
-    private suspend fun requestAndSaveData(query: String): Boolean {
+    private suspend fun requestAndSaveData(query: String){
         isRequestInProgress = true
-        var successful = false
 
-        try {
-            if(!isReachTotalCount){
-                val response = apiHelper.getUsersByPaging(query, lastRequestedPage, NETWORK_PAGE_SIZE)
-                Log.d("REPO", "$response")
-                inMemoryCache.addAll(response.items)
-                Log.d("REPO", "cache total: ${inMemoryCache.size}")
-                isReachTotalCount = inMemoryCache.size == response.total_count
-                searchResults.offer(UserSearchResult.Success(inMemoryCache))
-                successful = true
-            }else{
-                successful = false
-                Log.d("REPO", "total: ${inMemoryCache.size}")
-            }
+        //Check if get all users
+        if (isReachTotalCount) {
+            searchResults.offer(Resource.full(null, "Is full"))
+            isRequestInProgress = false
+            return
+        }
 
-        } catch (exception: IOException) {
-            searchResults.offer(UserSearchResult.Error(exception))
-        } catch (exception: HttpException) {
-            searchResults.offer(UserSearchResult.Error(exception))
+        //Loading
+        searchResults.offer(Resource.loading(emptyList()))
+
+        //Check network
+        if (!networkHelper.isNetworkConnected()){
+            //No network
+            searchResults.offer(Resource.error("NO NETWORK", null))
+            isRequestInProgress = false
+            return
+        }
+
+        val response =
+            apiHelper.getUsersByPaging(query, lastRequestedPage, NETWORK_PAGE_SIZE)
+
+        if (!response.isSuccessful){
+            //Response error
+            searchResults.offer(Resource.error(response.errorBody().toString(), null))
+            isRequestInProgress = false
+            return
+        }
+
+        response.body()?.let {
+            if (it.items.isNotEmpty()) inMemoryCache.addAll(it.items)
+            if (inMemoryCache.size >= it.total_count) isReachTotalCount = true
+
+            searchResults.offer(Resource.success(inMemoryCache))
+            lastRequestedPage++
         }
 
         isRequestInProgress = false
-        return successful
-
     }
 
     suspend fun requestMore(immutableQuery: String) {
-        if (isRequestInProgress || isReachTotalCount) return
-        val successful = requestAndSaveData(immutableQuery)
-        if (successful) {
-            lastRequestedPage++
-        }
+        if (!isRequestInProgress) requestAndSaveData(immutableQuery)
     }
 }

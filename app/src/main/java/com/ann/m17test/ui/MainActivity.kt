@@ -8,21 +8,23 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ann.m17test.R
 import com.ann.m17test.data.model.User
-import com.ann.m17test.data.model.UserSearchResult
+import com.ann.m17test.utils.Status
 import com.ann.m17test.utils.hideSoftKeyboard
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-
+@ExperimentalCoroutinesApi
 class MainActivity : AppCompatActivity() {
 
     private val mainViewModel: MainViewModel by viewModel()
-    private lateinit var adapter: MainPagingAdapter
+    private lateinit var adapter: ConcatAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +36,7 @@ class MainActivity : AppCompatActivity() {
 
         savedInstanceState?.getString(LAST_SEARCH)?.let {
             if (mainViewModel.users.value == null) {
-                mainViewModel.searchUser(it)
+                mainViewModel.queryLiveData.postValue(it)
             }
         }
     }
@@ -47,13 +49,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupUI() {
-        adapter = MainPagingAdapter()
+        adapter = ConcatAdapter()
+        adapter.addAdapter(0, MainPagingAdapter())
+
         recyclerView.addItemDecoration(
             DividerItemDecoration(
                 recyclerView.context,
                 (recyclerView.layoutManager as LinearLayoutManager).orientation
             )
         )
+
         recyclerView.adapter = adapter
     }
 
@@ -98,14 +103,19 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupObserver() {
         mainViewModel.users.observe(this, Observer {
-            //TODO:progressbar
-            when (it) {
-                is UserSearchResult.Success -> {
-                    renderList(it.data)
+            when (it.status) {
+                Status.SUCCESS -> {
+                    it.data?.let { list -> renderList(list) }
                     recyclerView.visibility = View.VISIBLE
                 }
-                is UserSearchResult.Error -> {
-                    Toast.makeText(this, it.error.message, Toast.LENGTH_LONG).show()
+                Status.LOADING -> {
+                    Toast.makeText(this, "LOADING", Toast.LENGTH_LONG).show()
+                }
+                Status.FULL -> {
+                    Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
+                }
+                Status.ERROR -> {
+                    Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
                 }
             }
         })
@@ -118,9 +128,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private fun renderList(users: List<User>) {
-        adapter.submitList(users)
-        Log.d("REPO","adapter itemCount: ${adapter.itemCount}")
-//        adapter.notifyDataSetChanged()
+        //TODO
+        val mainAdapter = adapter.adapters[0] as MainPagingAdapter
+        mainAdapter.data.addAll(users)
+        mainAdapter.notifyDataSetChanged()
+        adapter.notifyDataSetChanged()
+        Log.d("REPO", "adapter itemCount: ${mainAdapter.itemCount}")
     }
 
     companion object {
