@@ -8,4 +8,11 @@ import retrofit2.http.Query
 interface ApiService {
     @GET("search/users")
     suspend fun getUsers(@Query("q") q: String): Response<GithubUser>
+
+    @GET("search/users")
+    suspend fun getUsersByPaging(
+        @Query("q") q: String,
+        @Query("page") page: Int,
+        @Query("per_page") perPage: Int
+    ): GithubUser
 }

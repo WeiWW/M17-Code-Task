@@ -1,7 +1,5 @@
 package com.ann.m17test.data.model
 
-import com.squareup.moshi.Json
-
 data class GithubUser(
     val incomplete_results: Boolean,
     val items: List<User>,

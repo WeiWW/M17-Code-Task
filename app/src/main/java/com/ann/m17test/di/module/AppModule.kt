@@ -15,7 +15,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 
 val appModule = module {
     single { provideOkHttpClient() }
-    single { provideRetrofit(get(), BuildConfig.BASE_URL) }
+    single { provideRetrofit(get()) }
     single { provideApiService(get()) }
     single { provideNetworkHelper(androidContext()) }
 
@@ -37,12 +37,11 @@ private fun provideOkHttpClient() = if (BuildConfig.DEBUG) {
     .build()
 
 private fun provideRetrofit(
-    okHttpClient: OkHttpClient,
-    BASE_URL: String
+    okHttpClient: OkHttpClient
 ): Retrofit =
     Retrofit.Builder()
         .addConverterFactory(MoshiConverterFactory.create())
-        .baseUrl(BASE_URL)
+        .baseUrl(BuildConfig.BASE_URL)
         .client(okHttpClient)
         .build()
 
