@@ -7,6 +7,6 @@ import org.koin.dsl.module
 @OptIn(ExperimentalCoroutinesApi::class)
 val repoModule = module {
     single {
-        MainRepository(get())
+        MainRepository(get(),get())
     }
 }

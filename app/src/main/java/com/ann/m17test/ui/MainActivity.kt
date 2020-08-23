@@ -62,10 +62,7 @@ class MainActivity : AppCompatActivity() {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 hideSoftKeyboard(this)
                 v.text.trim().toString().let {
-                    if (it.isNotBlank()) {
-                        recyclerView.scrollToPosition(0)
-                        mainViewModel.searchUser(it)
-                    }
+                    updateSearch(it)
                 }
                 return@setOnEditorActionListener true
             }
@@ -76,10 +73,7 @@ class MainActivity : AppCompatActivity() {
             if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
                 hideSoftKeyboard(this)
                 searchEditText.text?.trim().toString().let {
-                    if (it.isNotEmpty()) {
-                        recyclerView.scrollToPosition(0)
-                        mainViewModel.searchUser(it)
-                    }
+                    updateSearch(it)
                 }
                 true
             } else {
@@ -115,26 +109,14 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
-//        mainViewModel.users.observe(this, Observer {
-//            when (it.status) {
-//                Status.SUCCESS -> {
-//                    progressBar.visibility = View.GONE
-//                    it.data.let { users -> renderList(users.items) }
-//                    recyclerView.visibility = View.VISIBLE
-//                }
-//                Status.LOADING -> {
-//                    progressBar.visibility = View.VISIBLE
-//                    recyclerView.visibility = View.GONE
-//                }
-//                Status.ERROR -> {
-//                    //Handle Error
-//                    progressBar.visibility = View.GONE
-//                    Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
-//                }
-//            }
-//        })
     }
 
+    private fun updateSearch(search:String){
+        if (search.isNotBlank()){
+            recyclerView.scrollToPosition(0)
+            mainViewModel.queryLiveData.postValue(search)
+        }
+    }
     private fun renderList(users: List<User>) {
         adapter.submitList(users)
         Log.d("REPO","adapter itemCount: ${adapter.itemCount}")

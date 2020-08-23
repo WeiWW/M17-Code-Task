@@ -3,7 +3,6 @@ package com.ann.m17test.utils
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.Build
 
 class NetworkHelper constructor(private val context: Context) {
 
