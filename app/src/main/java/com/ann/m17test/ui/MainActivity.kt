@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ann.m17test.R
 import com.ann.m17test.data.model.User
 import com.ann.m17test.ui.adapter.MainPagingAdapter
-import com.ann.m17test.ui.viewModel.MainViewModel
+import com.ann.m17test.viewModel.MainViewModel
 import com.ann.m17test.utils.Status
 import com.ann.m17test.utils.hideSoftKeyboard
 import kotlinx.android.synthetic.main.activity_main.*
@@ -130,7 +130,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private fun renderList(users: List<User>) {
-        //TODO
         val mainAdapter = adapter.adapters[0] as MainPagingAdapter
         mainAdapter.data.addAll(users)
         mainAdapter.notifyDataSetChanged()
