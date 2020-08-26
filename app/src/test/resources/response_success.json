@@ -1,0 +1,27 @@
+{
+  "total_count": 301,
+  "incomplete_results": false,
+  "items": [
+    {
+      "login": "hkust-comp4651-17f",
+      "id": 31949735,
+      "node_id": "MDEyOk9yZ2FuaXphdGlvbjMxOTQ5NzM1",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/31949735?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/hkust-comp4651-17f",
+      "html_url": "https://github.com/hkust-comp4651-17f",
+      "followers_url": "https://api.github.com/users/hkust-comp4651-17f/followers",
+      "following_url": "https://api.github.com/users/hkust-comp4651-17f/following{/other_user}",
+      "gists_url": "https://api.github.com/users/hkust-comp4651-17f/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/hkust-comp4651-17f/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/hkust-comp4651-17f/subscriptions",
+      "organizations_url": "https://api.github.com/users/hkust-comp4651-17f/orgs",
+      "repos_url": "https://api.github.com/users/hkust-comp4651-17f/repos",
+      "events_url": "https://api.github.com/users/hkust-comp4651-17f/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/hkust-comp4651-17f/received_events",
+      "type": "Organization",
+      "site_admin": false,
+      "score": 1.0
+    }
+  ]
+}
