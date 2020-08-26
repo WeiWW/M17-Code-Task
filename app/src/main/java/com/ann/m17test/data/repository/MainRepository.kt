@@ -1,6 +1,6 @@
 package com.ann.m17test.data.repository
 
-import com.ann.m17test.data.api.ApiHelper
+import com.ann.m17test.data.api.ApiService
 import com.ann.m17test.data.model.User
 import com.ann.m17test.utils.NetworkHelper
 import com.ann.m17test.utils.Resource
@@ -13,7 +13,7 @@ private const val GITHUB_STARTING_PAGE_INDEX = 1
 private const val NETWORK_PAGE_SIZE = 100
 
 @ExperimentalCoroutinesApi
-class MainRepository(private val apiHelper: ApiHelper, private val networkHelper: NetworkHelper) {
+class MainRepository(private val apiService: ApiService, private val networkHelper: NetworkHelper) {
     // keep the last requested page. When the request is successful, increment the page number.
     private var lastRequestedPage = GITHUB_STARTING_PAGE_INDEX
 
@@ -58,7 +58,7 @@ class MainRepository(private val apiHelper: ApiHelper, private val networkHelper
         }
 
         val response =
-            apiHelper.getUsersByPaging(query, lastRequestedPage, NETWORK_PAGE_SIZE)
+            apiService.getUsersByPaging(query, lastRequestedPage, NETWORK_PAGE_SIZE)
 
         if (!response.isSuccessful){
             //Response error
