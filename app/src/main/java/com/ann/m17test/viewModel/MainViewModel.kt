@@ -2,22 +2,22 @@ package com.ann.m17test.viewModel
 
 import androidx.lifecycle.*
 import com.ann.m17test.data.model.User
-import com.ann.m17test.data.repository.MainRepository
+import com.ann.m17test.data.repository.Model
 import com.ann.m17test.utils.Resource
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 
 @ExperimentalCoroutinesApi
-class MainViewModel(
-    private val mainRepository: MainRepository
-) : ViewModel() {
+class MainViewModel : ViewModel(), KoinComponent {
+    private val mainRepository: Model by inject()
 
     val queryLiveData = MutableLiveData<String>()
     val users: LiveData<Resource<List<User>>> = queryLiveData.switchMap { queryString: String ->
         liveData {
             val repos =
-                mainRepository.getSearchResultStream(queryString).asLiveData(Dispatchers.Main)
+                mainRepository.getSearchResultStream(queryString).asLiveData()
             emitSource(repos)
         }
     }

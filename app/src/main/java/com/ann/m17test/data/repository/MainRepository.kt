@@ -8,12 +8,17 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 
 private const val GITHUB_STARTING_PAGE_INDEX = 1
 private const val NETWORK_PAGE_SIZE = 100
 
 @ExperimentalCoroutinesApi
-class MainRepository(private val apiService: ApiService, private val networkHelper: NetworkHelper) {
+class MainRepository : Model, KoinComponent {
+    private val apiService: ApiService by inject()
+    private val networkHelper: NetworkHelper by inject()
+
     // keep the last requested page. When the request is successful, increment the page number.
     private var lastRequestedPage = GITHUB_STARTING_PAGE_INDEX
 
@@ -22,6 +27,7 @@ class MainRepository(private val apiService: ApiService, private val networkHelp
 
     // avoid triggering multiple requests in the same time
     private var isRequestInProgress = false
+
     // check if load all the data
     private var isReachTotalCount = false
 
@@ -29,14 +35,14 @@ class MainRepository(private val apiService: ApiService, private val networkHelp
     // the subscriber will have the latest data
     private val searchResults = ConflatedBroadcastChannel<Resource<List<User>>>()
 
-    suspend fun getSearchResultStream(queryString: String): Flow<Resource<List<User>>> {
+    override suspend fun getSearchResultStream(queryString: String): Flow<Resource<List<User>>> {
         inMemoryCache.clear()
         isReachTotalCount = false
         requestAndSaveData(queryString)
         return searchResults.asFlow()
     }
 
-    private suspend fun requestAndSaveData(query: String){
+    private suspend fun requestAndSaveData(query: String) {
         isRequestInProgress = true
 
         //Check if get all users
@@ -50,7 +56,7 @@ class MainRepository(private val apiService: ApiService, private val networkHelp
         searchResults.offer(Resource.loading(emptyList()))
 
         //Check network
-        if (!networkHelper.isNetworkConnected()){
+        if (!networkHelper.isNetworkConnected()) {
             //No network
             searchResults.offer(Resource.error("NO NETWORK", null))
             isRequestInProgress = false
@@ -60,7 +66,7 @@ class MainRepository(private val apiService: ApiService, private val networkHelp
         val response =
             apiService.getUsersByPaging(query, lastRequestedPage, NETWORK_PAGE_SIZE)
 
-        if (!response.isSuccessful){
+        if (!response.isSuccessful) {
             //Response error
             searchResults.offer(Resource.error(response.errorBody().toString(), null))
             isRequestInProgress = false
@@ -78,7 +84,7 @@ class MainRepository(private val apiService: ApiService, private val networkHelp
         isRequestInProgress = false
     }
 
-    suspend fun requestMore(immutableQuery: String) {
+    override suspend fun requestMore(immutableQuery: String) {
         if (!isRequestInProgress) requestAndSaveData(immutableQuery)
     }
 }

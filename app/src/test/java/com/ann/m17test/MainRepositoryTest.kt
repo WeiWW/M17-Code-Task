@@ -2,11 +2,12 @@ package com.ann.m17test
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.asLiveData
-import com.ann.m17test.data.api.ApiService
 import com.ann.m17test.data.model.User
-import com.ann.m17test.data.repository.MainRepository
+import com.ann.m17test.data.repository.Model
+import com.ann.m17test.di.module.repoModule
 import com.ann.m17test.di.networkTestModule
 import com.ann.m17test.utils.*
+import com.ann.m17test.utils.SyncTaskExecutorRule
 import kotlinx.coroutines.*
 import org.amshove.kluent.shouldBe
 import org.junit.After
@@ -24,33 +25,34 @@ import java.net.HttpURLConnection
 @ExperimentalCoroutinesApi
 @ObsoleteCoroutinesApi
 @RunWith(JUnit4::class)
-class WebTest : KoinTest, MockSeverBase() {
+class MainRepositoryTest : KoinTest, MockSeverBase() {
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
     @get:Rule
     var syncTaskExecutorRule = SyncTaskExecutorRule()
 
-    private val apiService: ApiService by inject()
-    private val networkHelper: NetworkHelper by inject()
+    @get:Rule
+    var coroutineRule = MainCoroutineScopeRule()
 
+    private val repository: Model by inject()
 
     @Before
     override fun setup() {
         super.setup()
-        startKoin { modules(listOf(networkTestModule(getUrl()))) }
+        startKoin { modules(listOf(repoModule, networkTestModule(getUrl()))) }
     }
 
     @After
     override fun tearDown() {
         super.tearDown()
         stopKoin()
+        coroutineRule.coroutineContext.cancel()
+        coroutineRule.cleanupTestCoroutines()
     }
 
     @Test
     fun `server response error`() = runBlocking {
-        val repo = MainRepository(apiService, networkHelper)
-
         enqueue(
             `mock network response with json file`(
                 HttpURLConnection.HTTP_NOT_FOUND,
@@ -59,7 +61,7 @@ class WebTest : KoinTest, MockSeverBase() {
         )
 
         launch(Dispatchers.Default) {
-            val liveData = repo.getSearchResultStream("").asLiveData()
+            val liveData = repository.getSearchResultStream("").asLiveData()
             liveData.observeForever { result: Resource<List<User>> ->
                 result.status.shouldBe(Status.ERROR)
             }
@@ -70,8 +72,6 @@ class WebTest : KoinTest, MockSeverBase() {
     @ExperimentalCoroutinesApi
     @Test
     fun `server response success`() = runBlocking {
-
-        val repo = MainRepository(apiService, networkHelper)
         enqueue(
             `mock network response with json file`(
                 HttpURLConnection.HTTP_OK,
@@ -80,7 +80,7 @@ class WebTest : KoinTest, MockSeverBase() {
         )
 
         launch(Dispatchers.Default) {
-            val liveData = repo.getSearchResultStream("").asLiveData()
+            val liveData = repository.getSearchResultStream("").asLiveData()
             liveData.observeForever { result: Resource<List<User>> ->
                 result.status.shouldBe(Status.SUCCESS)
             }
@@ -90,7 +90,6 @@ class WebTest : KoinTest, MockSeverBase() {
 
     @Test
     fun `it is get end`() = runBlocking {
-        val repo = MainRepository(apiService, networkHelper)
         enqueue(
             `mock network response with json file`(
                 HttpURLConnection.HTTP_OK,
@@ -99,7 +98,7 @@ class WebTest : KoinTest, MockSeverBase() {
         )
 
         launch(Dispatchers.Default) {
-            val liveData = repo.getSearchResultStream("").asLiveData()
+            val liveData = repository.getSearchResultStream("").asLiveData()
             liveData.observeForever { result: Resource<List<User>> ->
                 result.data?.size.shouldBe(0)
             }
