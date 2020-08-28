@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupEditorActionListener() {
-        searchEditText.setOnEditorActionListener { v, actionId, event ->
+        searchEditText.setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 hideSoftKeyboard(this)
                 v.text.trim().toString().let {
@@ -95,10 +95,9 @@ class MainActivity : AppCompatActivity() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 val totalItemCount = layoutManager.itemCount
-                val visibleItemCount = layoutManager.childCount
                 val lastVisibleItemPos = layoutManager.findLastVisibleItemPosition()
 
-                mainViewModel.listScrolled(visibleItemCount, lastVisibleItemPos, totalItemCount)
+                mainViewModel.listScrolled(lastVisibleItemPos, totalItemCount)
             }
         })
     }
@@ -109,6 +108,7 @@ class MainActivity : AppCompatActivity() {
                 Status.SUCCESS -> {
                     it.data?.let { list -> renderList(list) }
                     recyclerView.visibility = View.VISIBLE
+                    progressBar.visibility = View.GONE
                 }
                 Status.LOADING -> {
                     Toast.makeText(this, "LOADING", Toast.LENGTH_LONG).show()
@@ -127,6 +127,7 @@ class MainActivity : AppCompatActivity() {
         if (search.isNotBlank()){
             recyclerView.scrollToPosition(0)
             mainViewModel.queryLiveData.postValue(search)
+            progressBar.visibility =View.VISIBLE
         }
     }
     private fun renderList(users: List<User>) {

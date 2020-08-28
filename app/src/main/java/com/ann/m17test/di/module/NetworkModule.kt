@@ -2,8 +2,6 @@ package com.ann.m17test.di.module
 
 import android.content.Context
 import com.ann.m17test.BuildConfig
-import com.ann.m17test.data.api.ApiHelper
-import com.ann.m17test.data.api.ApiHelperImpl
 import com.ann.m17test.data.api.ApiService
 import com.ann.m17test.utils.NetworkHelper
 import com.ann.m17test.utils.NetworkHelperImpl

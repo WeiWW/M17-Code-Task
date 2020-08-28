@@ -22,7 +22,7 @@ class MainViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    fun listScrolled(visibleItemCount: Int, lastVisibleItemId: Int, totalItemCount: Int) {
+    fun listScrolled(lastVisibleItemId: Int, totalItemCount: Int) {
         if (lastVisibleItemId + 3 >= totalItemCount) {
             val immutableQuery = queryLiveData.value
             if (immutableQuery != null) {

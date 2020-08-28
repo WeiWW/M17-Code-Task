@@ -5,10 +5,3 @@ class ConnectedNetworkHelper:NetworkHelper {
         return true
     }
 }
-
-class DisconnectedNetworkHelper:NetworkHelper{
-    override fun isNetworkConnected(): Boolean {
-        return false
-    }
-
-}

@@ -7,7 +7,7 @@ import android.net.NetworkCapabilities
 class NetworkHelperImpl constructor(private val context: Context) :NetworkHelper{
 
     override fun isNetworkConnected(): Boolean {
-        var result = false
+        var result: Boolean
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkCapabilities = connectivityManager.activeNetwork ?: return false

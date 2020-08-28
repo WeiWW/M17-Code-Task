@@ -5,6 +5,7 @@ import com.ann.m17test.data.model.User
 import com.ann.m17test.utils.NetworkHelper
 import com.ann.m17test.utils.Resource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -35,6 +36,7 @@ class MainRepository : Model, KoinComponent {
     // the subscriber will have the latest data
     private val searchResults = ConflatedBroadcastChannel<Resource<List<User>>>()
 
+    @OptIn(FlowPreview::class)
     override suspend fun getSearchResultStream(queryString: String): Flow<Resource<List<User>>> {
         inMemoryCache.clear()
         isReachTotalCount = false
